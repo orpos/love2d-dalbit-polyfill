@@ -1,20 +1,20 @@
 local g_require = require
 
-local bit = g_require("bit") :: any
+local bt = bit or g_require("bit") :: any
 
 -- Converts it to a unsigned 32 number
 local function u32(x)
-	return bit.band(x, 0xFFFFFFFF)
+	return bt.band(x, 0xFFFFFFFF)
 end
 
 local function logical_rshift(x, n)
-	return bit.band(bit.rshift(x, n), 0x7FFFFFFF)
+	return bt.band(bt.rshift(x, n), 0x7FFFFFFF)
 end
 
 local bit32 = {}
 
 bit32.band = function(a, b, ...)
-	local result = bit.band(a, b)
+	local result = bt.band(a, b)
 	if ... then
 		return bit32.band(result, ...)
 	end
@@ -22,7 +22,7 @@ bit32.band = function(a, b, ...)
 end
 
 bit32.bor = function(a, b, ...)
-	local result = bit.bor(a, b)
+	local result = bt.bor(a, b)
 	if ... then
 		return bit32.bor(result, ...)
 	end
@@ -30,7 +30,7 @@ bit32.bor = function(a, b, ...)
 end
 
 bit32.bxor = function(a, b, ...)
-	local result = bit.bxor(a, b)
+	local result = bt.bxor(a, b)
 	if ... then
 		return bit32.bxor(result, ...)
 	end
@@ -38,11 +38,11 @@ bit32.bxor = function(a, b, ...)
 end
 
 bit32.bnot = function(x)
-	return u32(bit.bnot(x))
+	return u32(bt.bnot(x))
 end
 
 bit32.lshift = function(x, disp)
-	return u32(bit.lshift(x, disp))
+	return u32(bt.lshift(x, disp))
 end
 
 bit32.rshift = function(x, disp)
@@ -50,7 +50,7 @@ bit32.rshift = function(x, disp)
 end
 
 bit32.arshift = function(x, disp)
-	return u32(bit.rshift(x, disp))
+	return u32(bt.rshift(x, disp))
 end
 
 return bit32
