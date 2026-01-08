@@ -24,7 +24,9 @@ local clamp = math.clamp
 local floor = math.floor
 local sign = math.sign
 
-local vector_create = ffi.metatype("vec3", {
+
+local vector_create
+vector_create = ffi.metatype("vec3", {
 	__new = function(ct, x, y, z)
 		local value = ffi.new(ct)
 		value.x = x or 0
@@ -32,7 +34,7 @@ local vector_create = ffi.metatype("vec3", {
 		value.z = z or 0
 		return value
 	end,
-	__add = function(a, b)
+	__add = function(a : any, b)
 		return vector_create(a.x + b.x, a.y + b.y, a.z + b.z)
 	end,
 	__tostring = function(self)
