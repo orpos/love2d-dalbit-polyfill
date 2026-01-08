@@ -1,0 +1,6 @@
+std = "luau"
+
+[lints]
+global_usage = "allow"
+shadowing = "allow"
+deprecated = "allow"
