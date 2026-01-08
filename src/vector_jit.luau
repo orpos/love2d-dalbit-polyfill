@@ -7,6 +7,8 @@ type vector = {
 local g_require = require
 
 local ffi = g_require("ffi") :: typeof(ffi)
+local typeof = require("./typeof")
+
 
 ffi.cdef([[
 typedef struct {
