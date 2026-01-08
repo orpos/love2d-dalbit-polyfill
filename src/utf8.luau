@@ -1,4 +1,4 @@
-local bit32 = bit or g_require("bit")
+local bit32 = require("./bit32")
 local bor = bit32.bor
 local band = bit32.band
 local rshift = bit32.rshift

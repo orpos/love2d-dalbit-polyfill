@@ -1,6 +1,6 @@
 -- lua port of https://github.com/luau-lang/luau/blob/master/VM/src/lmathlib.cpp
 
-local bit32 = bit or g_require("bit")
+local bit32 = require("./bit32")
 
 local floor = math.floor
 local band = bit32.band

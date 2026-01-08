@@ -2,6 +2,9 @@
 [한국어](README_kr.md) 👈
 # English
 
+#### This is a custom implementation of the polyfills designed for use in love2d with kaledis
+
+
 ## dalbit-polyfill
 Polyfill libraries for dalbit used transpiling luau to lua (especially Lua 5.3)
 
@@ -49,6 +52,6 @@ local a = newproxy() < 2 -- errors: "attempt to compare table < number"
 
 # TO-DOs
 - [x] Implement [vector](https://rfcs.luau.org/vector-library.html) library.
-- [ ] Benchmark `next` polyfill functions (between `luauNext` and `djb2Next`)
+- [x] Benchmark `next` polyfill functions (between `luauNext` and `djb2Next`) (it's about the same)
 - [ ] Implement `math.lerp`, `buffer.writebits`, and `buffer.readbits` [#9](https://github.com/CavefulGames/dalbit-polyfill/issues/9)
 - [ ] Implement `require` [#15](https://github.com/CavefulGames/dalbit-polyfill/issues/15)

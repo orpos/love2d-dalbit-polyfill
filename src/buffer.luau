@@ -1,6 +1,4 @@
 -- Some implementations are inspired by https://github.com/dekkonot/bitbuffer/
-local g_require = require
-
 local privateKey = require("./privateKey")
 local math = require("./math")
 local string = require("./string")
@@ -10,7 +8,7 @@ local isNumber = require("./isNumber")
 local expectNumber = require("./expectNumber")
 local expectTable = require("./expectTable")
 local expectString = require("./expectString")
-local bit32 = bit or g_require("bit")
+local bit32 = require("./bit32")
 
 local band = bit32.band
 local rshift = bit32.rshift

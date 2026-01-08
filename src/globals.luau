@@ -410,7 +410,6 @@ if jit ~= nil then
 else
 	vec = require("./vector")
 end
-local g_require = require
 return {
 	-- globals
 	type = type :: typeof(type),
@@ -436,7 +435,7 @@ return {
 	-- libraries
 
 	-- I just found out that love2d already bundles an bit library
-	bit32 = bit or g_require("bit"),
+	bit32 = require("./bit32"),
 	buffer = require("./buffer"),
 	debug = require("./debug"),
 	math = require("./math"),

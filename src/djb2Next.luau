@@ -1,4 +1,4 @@
-local bit32 = bit or g_require("bit")
+local bit32 = require("./bit32")
 local expectTable = require("./expectTable")
 
 local byte = string.byte

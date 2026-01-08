@@ -1,4 +1,5 @@
 -- credits to https://github.com/luau-lang/luau/blob/master/VM/src/ltable.cpp
+
 local g_require = require
 
 local bit32 = bit or g_require("bit")
