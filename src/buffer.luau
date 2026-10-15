@@ -11,6 +11,7 @@ local expectString = require("./expectString")
 local bit32 = require("./bit32")
 
 local band = bit32.band
+local bnot = bit32.bnot
 local rshift = bit32.rshift
 local bor = bit32.bor
 local lshift = bit32.lshift
@@ -723,6 +724,79 @@ local function fromstring(str: string): buffer_polyfill
 	}, BufferMetatable) :: any
 end
 
+local function readbits(b: buffer_polyfill, bitOffset: number, width: number): number
+    if _G.DALBIT_runtime_type_checking then
+        local funcName = "readbits"
+        expectTable(b, "buffer", 1, funcName)
+        expectNumber(bitOffset, 2, funcName)
+        expectNumber(width, 3, funcName)
+    end
+
+    if width < 0 or width > 32 then
+        error(`invalid argument #3 to 'readbits' (bit count must be between 0 and 32, got {width})`)
+    end
+
+    if width == 0 then return 0 end
+
+    local data = b[privateKey]
+
+    if _G.DALBIT_buffer_out_of_bounds then
+        local byteEnd = floor((bitOffset + width - 1) / 8)
+        if byteEnd >= #data then
+            error("buffer access out of bounds")
+        end
+    end
+
+    local result = 0
+    for i = 0, width - 1 do
+        local totalBit = bitOffset + i
+        local byteIndex = floor(totalBit / 8) + 1
+        local bitIndex = totalBit % 8
+        local bitValue = rshift(band(data[byteIndex], lshift(1, bitIndex)), bitIndex)
+        result = bor(result, lshift(bitValue, i))
+    end
+
+    return result
+end
+
+local function writebits(b: buffer_polyfill, bitOffset: number, width: number, value: number)
+    if _G.DALBIT_runtime_type_checking then
+        local funcName = "writebits"
+        expectTable(b, "buffer", 1, funcName)
+        expectNumber(bitOffset, 2, funcName)
+        expectNumber(width, 3, funcName)
+        expectNumber(value, 4, funcName)
+    end
+
+    if width < 0 or width > 32 then
+        error(`invalid argument #4 to 'writebits' (bit count must be between 0 and 32, got {width})`)
+    end
+
+    if width == 0 then return end
+
+    local data = b[privateKey]
+
+    if _G.DALBIT_buffer_out_of_bounds then
+        local byteEnd = floor((bitOffset + width - 1) / 8)
+        if byteEnd >= #data then
+            error("buffer access out of bounds")
+        end
+    end
+
+    value = band(value, 0xFFFFFFFF)
+
+    for i = 0, width - 1 do
+        local totalBit = bitOffset + i
+        local byteIndex = floor(totalBit / 8) + 1
+        local bitIndex = totalBit % 8
+        local bitValue = band(rshift(value, i), 1)
+        data[byteIndex] = bor(
+            band(data[byteIndex], bnot(lshift(1, bitIndex))),
+            lshift(bitValue, bitIndex)
+        )
+    end
+end
+
 local dalbit_buffer
 if not _G.DALBIT_test and buffer then
 	dalbit_buffer = buffer :: any
@@ -752,6 +826,8 @@ else
 		readstring = readstring,
 		tostring = tostring,
 		fromstring = fromstring,
+		writebits = writebits,
+		readbits = readbits
 	}
 end
 

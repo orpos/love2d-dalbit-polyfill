@@ -6,16 +6,15 @@ type vector = {
 
 local g_require = require
 
-local ffi = g_require("ffi") :: typeof(ffi)
+local ffi = g_require("ffi")
 local typeof = require("./typeof")
-
 
 ffi.cdef([[
 typedef struct {
 	float x;
 	float y;
 	float z;
-}  vec3;
+} vec3;
 ]])
 
 local math = require("./math")
@@ -26,7 +25,6 @@ local clamp = math.clamp
 local floor = math.floor
 local sign = math.sign
 
-
 local vector_create
 vector_create = ffi.metatype("vec3", {
 	__new = function(ct, x, y, z)
@@ -36,26 +34,36 @@ vector_create = ffi.metatype("vec3", {
 		value.z = z or 0
 		return value
 	end,
-	__add = function(a : any, b)
-		return vector_create(a.x + b.x, a.y + b.y, a.z + b.z)
-	end,
 	__tostring = function(self)
 		return `{self.x}, {self.y}, {self.z}`
 	end,
-	__sub = function(vec1: vector, vec2: vector)
-		return vector_create(vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z)
+	__unm = function(vec)
+		return vector_create(-vec.x, -vec.y, -vec.z)
 	end,
-	__mul = function(vec1: vector, vec2: vector | number)
-		if typeof(vec2) == "number" then
-			return vector_create(vec1.x * vec2, vec1.y * vec2, vec1.z * vec2)
-		end
-		return vector_create(vec1.x * vec2.x, vec1.y * vec2.y, vec1.z * vec2.z)
+	__eq = function(a, b)
+		return a.x == b.x and a.y == b.y and a.z == b.z
 	end,
-	__div = function(vec1: vector, vec2: vector | number)
-		if typeof(vec2) == "number" then
-			return vector_create(vec1.x / vec2, vec1.y / vec2, vec1.z / vec2)
+	__add = function(a, b)
+		return vector_create(a.x + b.x, a.y + b.y, a.z + b.z)
+	end,
+	__sub = function(a, b)
+		return vector_create(a.x - b.x, a.y - b.y, a.z - b.z)
+	end,
+	__mul = function(a, b)
+		if typeof(a) == "number" then
+			return vector_create(b.x * a, b.y * a, b.z * a)
+		elseif typeof(b) == "number" then
+			return vector_create(a.x * b, a.y * b, a.z * b)
 		end
-		return vector_create(vec1.x / vec2.x, vec1.y / vec2.y, vec1.z / vec2.z)
+		return vector_create(a.x * b.x, a.y * b.y, a.z * b.z)
+	end,
+	__div = function(a, b)
+		if typeof(a) == "number" then
+			return vector_create(a / b.x, a / b.y, a / b.z)
+		elseif typeof(b) == "number" then
+			return vector_create(a.x / b, a.y / b, a.z / b)
+		end
+		return vector_create(a.x / b.x, a.y / b.y, a.z / b.z)
 	end,
 })
 
@@ -77,12 +85,15 @@ local function vector_cross(vec1: vector, vec2: vector)
 end
 
 local function vector_dot(vec1: vector, vec2: vector)
-	return (vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z)
+	return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z
 end
 
 local function vector_angle(vec1: vector, vec2: vector, axis: vector?)
-	local cross =
-		{ vec1.y * vec2.z - vec1.z * vec2.y, vec1.z * vec2.x - vec1.x * vec2.z, vec1.x * vec2.y - vec1.y * vec2.x }
+	local cross = {
+		vec1.y * vec2.z - vec1.z * vec2.y,
+		vec1.z * vec2.x - vec1.x * vec2.z,
+		vec1.x * vec2.y - vec1.y * vec2.x,
+	}
 
 	local sin_vec1 = (cross[1] ^ 2 + cross[2] ^ 2 + cross[3] ^ 2) ^ 0.5
 	local cos_vec1 = vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z
@@ -114,58 +125,49 @@ local function vector_sign(vec: vector)
 end
 
 local function vector_clamp(vec: vector, min: vector, max: vector)
-	for k, v in min :: any do
-		if not ((v :: number) > (max :: any)[k]) then
-			continue
-		end
-		error(`invalid argument #3 to 'clamp' (max.{k} must be greater than or equal to min.{k})`)
+	if min.x > max.x then
+		error("invalid argument #3 to 'clamp' (max.x must be greater than or equal to min.x)")
+	end
+	if min.y > max.y then
+		error("invalid argument #3 to 'clamp' (max.y must be greater than or equal to min.y)")
+	end
+	if min.z > max.z then
+		error("invalid argument #3 to 'clamp' (max.z must be greater than or equal to min.z)")
 	end
 
 	return vector_create(clamp(vec.x, min.x, max.x), clamp(vec.y, min.y, max.y), clamp(vec.z, min.z, max.z))
 end
 
-local function vector_min(vector: vector, ...: vector)
-	local result = { vector.x, vector.y, vector.z }
+local function vector_min(vec: vector, ...: vector)
+	local result = { vec.x, vec.y, vec.z }
 	local args = { ... }
 
 	for i = 1, #args do
-		local vec: vector = args[i]
-		if vec.x < result[1] then
-			result[1] = vec.x
-		end
-		if vec.y < result[2] then
-			result[2] = vec.y
-		end
-		if vec.z < result[3] then
-			result[3] = vec.z
-		end
+		local v: vector = args[i]
+		if v.x < result[1] then result[1] = v.x end
+		if v.y < result[2] then result[2] = v.y end
+		if v.z < result[3] then result[3] = v.z end
 	end
 
 	return vector_create(result[1], result[2], result[3])
 end
 
-local function vector_max(vector: vector, ...: vector)
-	local result = { vector.x, vector.y, vector.z }
+local function vector_max(vec: vector, ...: vector)
+	local result = { vec.x, vec.y, vec.z }
 	local args = { ... }
 
 	for i = 1, #args do
-		local vec: vector = args[i]
-		if vec.x > result[1] then
-			result[1] = vec.x
-		end
-		if vec.y > result[2] then
-			result[2] = vec.y
-		end
-		if vec.z > result[3] then
-			result[3] = vec.z
-		end
+		local v: vector = args[i]
+		if v.x > result[1] then result[1] = v.x end
+		if v.y > result[2] then result[2] = v.y end
+		if v.z > result[3] then result[3] = v.z end
 	end
 
 	return vector_create(result[1], result[2], result[3])
 end
 
 local vector_zero = vector_create(0, 0, 0)
-local vector_one: vector = vector_create(1, 1, 1)
+local vector_one = vector_create(1, 1, 1)
 
 return {
 	abs = vector_abs,

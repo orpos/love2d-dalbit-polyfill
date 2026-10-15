@@ -433,8 +433,6 @@ return {
 	loadstring = dalbit_loadstring :: typeof(loadstring),
 
 	-- libraries
-
-	-- I just found out that love2d already bundles an bit library
 	bit32 = require("./bit32"),
 	buffer = require("./buffer"),
 	debug = require("./debug"),

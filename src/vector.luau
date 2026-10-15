@@ -5,7 +5,6 @@ type vector = {
 } & number
 
 local math = require("./math")
-local typeof = require("./typeof")
 local abs = math.abs
 local atan2 = math.atan2
 local ceil = math.ceil
