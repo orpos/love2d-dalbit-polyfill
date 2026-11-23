@@ -189,6 +189,10 @@ local function sign(n: number): number
 	end
 end
 
+local function map(x: number, inMin: number, inMax: number, outMin: number, outMax: number): number
+	return outMin + (x - inMin) * (outMax - outMin) / (inMax - inMin)
+end
+
 local function lerp(a: number, b: number, t: number): number
 	return a + (b - a) * t
 end
@@ -202,6 +206,7 @@ if _G.DALBIT_test then
 		cosh = cosh,
 		sinh = sinh,
 		tanh = tanh,
+		map = map,
 		pow = pow,
 		noise = perlin,
 		frexp = frexp,

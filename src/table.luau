@@ -177,8 +177,33 @@ local function isfrozen(t: {}): boolean
 	return frozenTables[t] ~= nil
 end
 
-local unpack = table.unpack
-local pack = table.pack
+local function pack(...)
+	local n = select("#", ...)
+	local t = { n = n }
+	for i = 1, n do
+		t[i] = (select(i, ...))
+	end
+	return t
+end
+
+local rawunpack = unpack
+if not table.unpack then
+	function table.unpack(t: any, i: number?, j: number?)
+		i = i or 1
+		j = j or #t
+		if i > j then return end
+		local mt = getmetatable(t)
+		if not (mt and mt.__index) then
+			return rawunpack(t, i, j)
+		end
+		local buf, n = {}, 0
+		for k = i, j do
+			n = n + 1
+			buf[n] = t[k]
+		end
+		return rawunpack(buf, 1, n)
+	end
+end
 
 local function getn(t: {}): number
 	if _G.DALBIT_runtime_type_checking then
@@ -216,7 +241,7 @@ return {
 	concat = table.concat,
 	insert = table.insert,
 	move = table.move,
-	pack = table.pack,
+	pack = pack,
 	remove = table.remove,
 	sort = table.sort,
 	unpack = table.unpack,
